@@ -12,19 +12,32 @@ contract Category is Ownable {
         uint amount;
         uint timestamp;
     }
-
+    Transaction[] public transactions;
     // category mapping
-    mapping(string => Transaction[]) transactionCategories;
+    mapping(uint => string) transactionToCategory;
+    mapping(string => uint) transactionsPerCategory;
 
     // Record Transaction Function
     function recordTransaction(address _sender, address _receiver, uint _amount, uint _timestamp, string memory _category) public onlyOwner {
-        Transaction memory newTransaction = Transaction(_sender, _receiver, _amount, _timestamp);
-        transactionCategories[_category].push(newTransaction);
+        transactions.push(Transaction(_sender, _receiver, _amount, _timestamp));
+        uint id = transactions.length - 1;
+        transactionToCategory[id] = _category;
+        transactionsPerCategory[_category]++;
     }
 
     // Get transactions
-    function getTransactionsByCategory(string memory _category) public view returns (Transaction[] memory) {
-        return transactionCategories[_category];
+    function getTransactionsByCategory(string memory _category) public view onlyOwner returns (uint[] memory) {
+        uint[] memory result = new uint[](transactionsPerCategory[_category]);
+        uint counter = 0;
+        for(uint i = 0; i < transactions.length; i++)
+        {
+            if(keccak256(abi.encodePacked(transactionToCategory[i])) == keccak256(abi.encodePacked(_category)))
+            {
+                result[counter] = i;
+                counter++;
+            }
+        }
+        return result;
     }
 
 }
