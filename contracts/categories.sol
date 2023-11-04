@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >= 0.6.0 < 0.9.0;
+pragma solidity ^0.8.0;
 
-contract Catagory {
+import "./ownable.sol";
+
+contract Category is Ownable {
 
     // structure to store transaction details
     struct Transaction {
@@ -11,17 +13,18 @@ contract Catagory {
         uint timestamp;
     }
 
-    // catagory mapping
-    mapping(bytes32 => Transaction[]) transactionCategories;
+    // category mapping
+    mapping(string => Transaction[]) transactionCategories;
 
     // Record Transaction Function
-    function recordTransaction(address _sender, address _receiver, uint _amount, uint _timestamp, bytes32 _category) public {
+    function recordTransaction(address _sender, address _receiver, uint _amount, uint _timestamp, string memory _category) public onlyOwner {
         Transaction memory newTransaction = Transaction(_sender, _receiver, _amount, _timestamp);
         transactionCategories[_category].push(newTransaction);
     }
 
     // Get transactions
-    function getTransactionsByCategory(bytes32 _category) public view returns (Transaction[] memory) {
+    function getTransactionsByCategory(string memory _category) public view returns (Transaction[] memory) {
         return transactionCategories[_category];
     }
+
 }
