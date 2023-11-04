@@ -65,18 +65,19 @@ contract Category is Ownable {
         uint expenditure,
         uint savings
     ) {
-        uint[] memory transactionsInTime = getTransactionsByTime(_timeperiod);
         uint t_earnings = 0;
         uint t_savings = 0;
         uint t_expenditure = 0;
-        for(uint i = 0; i < transactionsInTime.length; i++)
-        {
-            if(transactions[transactionsInTime[i]].sender == owner())
-                t_expenditure += transactions[transactionsInTime[i]].amount;
 
-            else if(transactions[transactionsInTime[i]].receiver == owner())
-                t_earnings += transactions[transactionsInTime[i]].amount;
-            
+        for(uint i = 0; i < transactions.length; i++)
+        {
+            if(transactions[i].timestamp >= (block.timestamp - _timeperiod)){
+                if(transactions[i].sender == owner())
+                    t_expenditure += transactions[i].amount;
+
+                else if(transactions[i].receiver == owner())
+                    t_earnings += transactions[i].amount;
+            }
         }
         t_savings = t_earnings - t_expenditure;
         
