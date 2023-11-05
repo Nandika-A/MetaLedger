@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-ethers");
 require("dotenv").config()
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -17,9 +18,7 @@ module.exports = {
       url: SEPOLIA_RPC_URL,
       accounts: [PRIVATE_KEY],
       chainId: 11155111,
-      gas: 2100000,
-      gasPrice: 8000000000,
-      saveDeployments: true,
+      blockConfirmations: 6,
     },
     localhost: {
       url: "http://localhost:8545",
