@@ -15,27 +15,16 @@ contract Category is Ownable {
         uint timestamp;
     }
 
-    Transaction[] public transactions;
+    Transaction[] private transactions;
     // category mapping
     mapping(uint => string) transactionToCategory;
     mapping(string => uint) transactionsPerCategory;
-    mapping(uint => address) transactionToUser;
+    mapping(uint=>address) transactionToUser;
 
     uint totalTransactions;
 
-    address user;
-
-    function setUser(address _user) external {
-        user = _user;
-    }
-
-    modifier onlyUser() {
-        require(user == msg.sender);
-        _;
-    }
-
     // Record Transaction Function
-    function recordTransaction(address _user, address _sender, address _receiver, uint _amount, string memory _category) public onlyOwner{
+    function recordTransaction(address _user, address _sender, address _receiver, uint _amount, string memory _category) public{
         transactions.push(Transaction(_sender, _receiver, _amount, block.timestamp));
         uint id = transactions.length - 1;
         transactionToCategory[id] = _category;
@@ -46,7 +35,7 @@ contract Category is Ownable {
     }
 
     // Get transactions
-    function getTransactionsByCategory(address _user, string memory _category) public view onlyUser returns (uint[] memory) {
+    function getTransactionsByCategory(address _user, string memory _category) public view onlyOwner returns (uint[] memory) {
         uint[] memory result = new uint[](transactionsPerCategory[_category]);
         uint counter = 0;
         for(uint i = 0; i < transactions.length; i++)
@@ -60,7 +49,7 @@ contract Category is Ownable {
         return result;
     }
 
-    function getTransactionsByTime(address _user, uint _timeperiod) public view onlyUser returns(uint[] memory) {
+    function getTransactionsByTime(address _user, uint _timeperiod) public view onlyOwner returns(uint[] memory) {
         uint[] memory result = new uint[](totalTransactions);
         uint counter = 0;
         for(uint i = 0; i < transactions.length; i++)
@@ -74,7 +63,7 @@ contract Category is Ownable {
         return result;
     } 
 
-    function getTotalExpenses(address _user, uint _timeperiod) public view onlyUser returns(
+    function getTotalExpenses(address _user, uint _timeperiod) public view onlyOwner returns(
         uint earnings,
         uint expenditure,
         uint savings
@@ -85,7 +74,7 @@ contract Category is Ownable {
 
         for(uint i = 0; i < transactions.length; i++)
         {
-            if(transactions[i].timestamp >= (block.timestamp - _timeperiod)){
+            if(transactionToUser[i] == _user && transactions[i].timestamp >= (block.timestamp - _timeperiod)){
                 if(transactions[i].sender == _user)
                     t_expenditure += transactions[i].amount;
 
