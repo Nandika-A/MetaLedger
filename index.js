@@ -1,7 +1,11 @@
+import { ethers } from "./ethers-5.1.esm.min.js"
+import { abi, contractAddress } from "./constants.js"
+
 let currentAccount = null;
 
 const ethereumButton = document.querySelector('.enableEthereumButton');
 const showAccount = document.querySelector('.showAccount');
+const record = document.querySelector('.record');
 
 ethereumButton.addEventListener('click', () => {
   getAccount();
@@ -60,4 +64,46 @@ window.ethereum.on('chainChanged', handleChainChanged);
 function handleChainChanged(chainId) {
   // We recommend reloading the page, unless you must do otherwise.
   window.location.reload();
+}
+
+// *****************************************************
+// Accessing contract
+
+record.addEventListener('click', () => {
+  recordTransaction();
+});
+
+async function recordTransaction() {
+  if (typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+    const contract = new ethers.Contract(contractAddress, abi, signer)
+    try {
+      const transactionResponse = await contract.recordTransaction({
+        
+      })
+      await listenForTransactionMine(transactionResponse, provider)
+    } catch (error) {
+      console.log(error)
+    }
+    console.log(signer)
+  } else {
+    fundButton.innerHTML = "Please install MetaMask"
+  }
+}
+
+function listenForTransactionMine(transactionResponse, provider) {
+  console.log(`Mining ${transactionResponse.hash}`)
+  return new Promise((resolve, reject) => {
+      try {
+          provider.once(transactionResponse.hash, (transactionReceipt) => {
+              console.log(
+                  `Completed with ${transactionReceipt.confirmations} confirmations. `
+              )
+              resolve()
+          })
+      } catch (error) {
+          reject(error)
+      }
+  })
 }
