@@ -2,6 +2,10 @@ import { ethers } from "./ethers-5.1.esm.min.js"
 import { abi, contractAddress } from "./constants.js"
 
 let currentAccount = null;
+const day = 86400;
+const week = 604800;
+const month = 2628000;
+const year = 31560000;
 
 const ethereumButton = document.querySelector('.enableEthereumButton');
 const showAccount = document.querySelector('.showAccount');
@@ -152,12 +156,11 @@ async function getTransactionsByTime() {
     try {
       const transactionResponse = await contract.getTransactionsByTime(
         "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
-        "")
+        1)
         console.log(transactionResponse)
-      getCategory.innerHTML = transactionResponse;
       const expenses = await contract.getTotalExpenses(
         "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
-        ""
+        1
       )
       console.log(expenses)
     } 
