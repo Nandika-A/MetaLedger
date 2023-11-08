@@ -6,6 +6,8 @@ let currentAccount = null;
 const ethereumButton = document.querySelector('.enableEthereumButton');
 const showAccount = document.querySelector('.showAccount');
 const record = document.querySelector('.record');
+const getCategory = document.querySelector('.category');
+const getTime = document.querySelector('.time');
 
 ethereumButton.addEventListener('click', () => {
   getAccount();
@@ -79,14 +81,18 @@ async function recordTransaction() {
     const signer = provider.getSigner()
     const contract = new ethers.Contract(contractAddress, abi, signer)
     try {
-      const transactionResponse = await contract.recordTransaction({
-        
-      })
+      const transactionResponse = await contract.recordTransaction(
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        "125",
+        "food")
       await listenForTransactionMine(transactionResponse, provider)
-    } catch (error) {
+      console.log(transactionResponse)
+    } 
+    catch (error) {
       console.log(error)
     }
-    console.log(signer)
   } else {
     fundButton.innerHTML = "Please install MetaMask"
   }
@@ -107,3 +113,59 @@ function listenForTransactionMine(transactionResponse, provider) {
       }
   })
 }
+
+getCategory.addEventListener('click', () => {
+  getTransactionsByCategory();
+});
+
+
+async function getTransactionsByCategory() {
+  if (typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+    const contract = new ethers.Contract(contractAddress, abi, signer)
+    try {
+      const transactionResponse = await contract.getTransactionsByCategory(
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        "food")
+        console.log(transactionResponse)
+      getCategory.innerHTML = transactionResponse;
+    } 
+    catch (error) {
+      console.log(error)
+    }
+  } else {
+    fundButton.innerHTML = "Please install MetaMask"
+  }
+}
+
+getTime.addEventListener('click', () => {
+  getTransactionsByTime();
+});
+
+
+async function getTransactionsByTime() {
+  if (typeof window.ethereum !== "undefined") {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+    const contract = new ethers.Contract(contractAddress, abi, signer)
+    try {
+      const transactionResponse = await contract.getTransactionsByTime(
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        "")
+        console.log(transactionResponse)
+      getCategory.innerHTML = transactionResponse;
+      const expenses = await contract.getTotalExpenses(
+        "0xe2ba10c388ef4a013db4ff13f56b742893208d05",
+        ""
+      )
+      console.log(expenses)
+    } 
+    catch (error) {
+      console.log(error)
+    }
+  } else {
+    fundButton.innerHTML = "Please install MetaMask"
+  }
+}
+
